@@ -1,4 +1,4 @@
-"""API de Pomodoro UTB (FastAPI + Supabase).
+"""API de Pomodoro Gamificado (FastAPI + Supabase).
 
 Correr:  uvicorn app.main:app --reload
 Docs:    http://127.0.0.1:8000/docs
@@ -14,7 +14,7 @@ from .config import ajustes
 from .routers import auth, configuracion, logros, mascota, materias, perfil, pesca, sesiones
 
 app = FastAPI(
-    title="Pomodoro API",
+    title="Pomodoro Gamificado API",
     version="1.0.0",
     description="Backend del Pomodoro gamificado: sesiones, racha, mascota, conchas y logros.",
 )

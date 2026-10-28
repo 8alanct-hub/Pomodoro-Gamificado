@@ -1,5 +1,5 @@
 @echo off
-rem Inicia la API de Pomodoro UTB. Doble clic o, en cmd: iniciar_api
+rem Inicia la API de Pomodoro Gamificado. Doble clic o, en cmd: iniciar_api
 cd /d "%~dp0"
 
 rem La primera vez crea el entorno virtual e instala las dependencias.

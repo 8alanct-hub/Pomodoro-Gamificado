@@ -179,7 +179,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
                       ),
                     const SizedBox(height: 18),
                     const Text(
-                      'Pomodoro UTB · versión 1.0',
+                      'Pomodoro Gamificado · versión 1.0',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 12, color: Color(0xFF8A8FB0)),
                     ),

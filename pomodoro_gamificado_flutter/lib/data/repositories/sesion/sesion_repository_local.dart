@@ -36,13 +36,16 @@ class SesionRepositoryLocal implements SesionRepository {
     // Los minutos siempre suman a estadísticas y meta (RF-005 CA-002).
     await _materiaRepo.sumarMinutos(sesion.materiaId, sesion.minutosEnfoque);
     // Conchas y racha solo con bloques completos de 25 min (RF-005 CA-004).
-    final rachaAntes = _data.mascota.rachaDias;
+    final ahora = DateTime.now();
+    final hoy = DateTime(ahora.year, ahora.month, ahora.day);
+    final yaContabaHoy = _data.ultimoDiaConRacha == hoy;
     final r = await _gamificacionRepo.registrarEnfoque(sesion.minutosEnfoque);
     if (r is Error<Mascota>) return Result.error(r.error);
     final mascota = (r as Ok<Mascota>).value;
     return Result.ok((
       conchas: sesion.conchasGanadas,
-      rachaNueva: mascota.rachaDias > rachaAntes,
+      // Solo el primer bloque de 25 min del día suma la racha (como la API).
+      rachaNueva: sesion.conchasGanadas > 0 && !yaContabaHoy,
       mascota: mascota,
     ));
   }

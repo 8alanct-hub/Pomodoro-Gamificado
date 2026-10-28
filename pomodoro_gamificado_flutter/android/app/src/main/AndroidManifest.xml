@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- La app se conecta a la API (pomodoro_api). Sin esto, la versión
+         release instalada en el celular no tiene acceso a internet. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
-        android:label="pomodoro_gamificado_flutter"
+        android:label="Pomodoro Gamificado"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

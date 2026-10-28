@@ -34,7 +34,9 @@ class ApiClient {
   /// Se llama cuando la sesión venció y no se pudo renovar.
   void Function()? alVencerSesion;
 
-  static const _tiempoMaximo = Duration(seconds: 15);
+  /// El plan gratis de Render apaga la API tras 15 min sin uso y tarda cerca
+  /// de 1 minuto en despertar, así que la primera petición puede demorar.
+  static const _tiempoMaximo = Duration(seconds: 75);
 
   bool get tieneSesion => _accessToken != null;
 

@@ -9,14 +9,18 @@ class GamificacionRepositoryLocal implements GamificacionRepository {
     : _data = localDataService;
 
   final LocalDataService _data;
+  /// Igual que la API: cada lectura revisa antes los días sin estudiar, así
+  /// Inicio y Mascota siempre muestran la misma racha y los mismos panes.
   @override
-  Future<Result<Mascota>> obtenerMascota() async => Result.ok(_data.mascota);
+  Future<Result<Mascota>> obtenerMascota() => revisarRachaDelDia();
 
   /// Recompensas de una sesión con [minutosEnfoque] cumplidos: conchas por
   /// bloque de 25 min y el día de racha (lo usa SesionRepositoryLocal).
   Future<Result<Mascota>> registrarEnfoque(int minutosEnfoque) async {
     final conchas = SesionPomodoro.conchasPara(minutosEnfoque);
     if (conchas == 0) return Result.ok(_data.mascota);
+    // Primero se cobran los días perdidos (panes o reinicio), como en la API.
+    await revisarRachaDelDia();
 
     var m = _data.mascota.copyWith(conchas: _data.mascota.conchas + conchas);
     final hoy = _soloFecha(DateTime.now());
@@ -37,9 +41,35 @@ class GamificacionRepositoryLocal implements GamificacionRepository {
 
   @override
   Future<Result<Mascota>> revisarRachaDelDia() async {
-    // TODO: calcular los días sin estudiar desde _data.ultimoDiaConRacha, gastar
-    // un pan por día y, si no quedan, reiniciar la racha y volver a huevo
-    // (con los 2 panes recuperados para cuando vuelva a nacer).
+    // Mismas reglas que la API (pomodoro_api/app/reglas.py).
+    final ultimo = _data.ultimoDiaConRacha;
+    if (ultimo == null) return Result.ok(_data.mascota);
+    final hoy = _soloFecha(DateTime.now());
+    // Días completos sin estudiar entre el último día cubierto y hoy.
+    final perdidos = hoy.difference(_soloFecha(ultimo)).inDays - 1;
+    if (perdidos <= 0) return Result.ok(_data.mascota);
+
+    final m = _data.mascota;
+    if (m.panes >= perdidos) {
+      // RF-015 CA-001: un pan por cada día perdido; la racha sigue.
+      _data.mascota = m.copyWith(panes: m.panes - perdidos);
+      _data.ultimoDiaConRacha = hoy.subtract(const Duration(days: 1));
+    } else {
+      // RF-010 CA-002: sin panes suficientes la racha vuelve a 0 y la mascota a
+      // huevo, con los 2 panes listos para cuando nazca de nuevo.
+      _data.mascota = Mascota(
+        estado: EstadoMascota.huevo,
+        rachaDias: 0,
+        felicidad: 50,
+        panes: Mascota.maxPanes,
+        conchas: m.conchas,
+        recordPesca: m.recordPesca,
+        mejorRacha: m.rachaDias > m.mejorRacha ? m.rachaDias : m.mejorRacha,
+        pecesTotales: m.pecesTotales,
+        nombre: m.nombre,
+      );
+      _data.ultimoDiaConRacha = null;
+    }
     return Result.ok(_data.mascota);
   }
 

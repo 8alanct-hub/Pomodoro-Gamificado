@@ -1,4 +1,4 @@
-# Pomodoro UTB API
+# Pomodoro Gamificado API
 
 Backend del Pomodoro gamificado con **FastAPI + Supabase**. La base de datos y el login
 viven en Supabase; la API pone las reglas del juego (conchas, racha, panes, mascota,
@@ -112,6 +112,24 @@ mascota. El código está en `app/ia.py`.
 - El mensaje se guarda por estudiante mientras su situación no cambie (mismo día,
   racha, felicidad, minutos…), para no gastar una llamada cada vez que abre la pantalla.
 - La IA solo recibe esos datos de estudio: nunca el correo ni la contraseña.
+
+## 6. Publicar la API en internet (Render) y app para el celular
+
+1. Sube la rama a GitHub (con `render.yaml` en la raíz del repositorio).
+2. En <https://render.com> → **New → Blueprint** → elige el repositorio y la rama.
+   Render lee `render.yaml` y pide los secretos: `SUPABASE_PUBLISHABLE_KEY`,
+   `SUPABASE_SECRET_KEY` y `GEMINI_API_KEY` (los mismos del `.env`).
+3. Cuando termine, la API queda en `https://pomodoro-gamificado-api.onrender.com`
+   (Render muestra la URL exacta). Prueba `…/salud`.
+4. APK para Android, en `pomodoro_gamificado_flutter`:
+   ```
+   flutter build apk --release --dart-define=API_URL=https://pomodoro-gamificado-api.onrender.com
+   ```
+   El archivo queda en `build\app\outputs\flutter-apk\app-release.apk`.
+
+En el plan gratis la API se apaga tras 15 min sin uso y tarda cerca de 1 minuto en
+despertar: la primera acción después de un rato puede demorar. Antes de una demo,
+abre `…/salud` en el navegador para despertarla.
 
 ## Notas
 

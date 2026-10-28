@@ -1,0 +1,31 @@
+# Despliegue de la API en Render (https://render.com/docs/blueprint-spec).
+# Render → New → Blueprint → elige este repositorio y la rama.
+services:
+  - type: web
+    name: pomodoro-gamificado-api
+    runtime: python
+    rootDir: pomodoro_api
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /salud
+    envVars:
+      # Las versiones fijadas en requirements.txt están probadas con Python 3.13.
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: SUPABASE_URL
+        value: https://qqtvureimsgbtdpakulc.supabase.co
+      # Los secretos se escriben en el panel de Render al crear el servicio.
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODELO
+        value: gemini-3.5-flash-lite
+      - key: DOMINIO_CORREO
+        value: utb.edu.co
+      # En producción se valida el tiempo real de cada pomodoro.
+      - key: MODO_DESARROLLO
+        value: "false"

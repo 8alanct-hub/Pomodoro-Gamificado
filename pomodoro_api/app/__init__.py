@@ -1,1 +1,1 @@
-"""API de Pomodoro UTB."""
+"""API de Pomodoro Gamificado."""
