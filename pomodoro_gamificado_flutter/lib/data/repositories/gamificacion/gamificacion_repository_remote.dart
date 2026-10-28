@@ -21,6 +21,12 @@ class GamificacionRepositoryRemote implements GamificacionRepository {
   Future<Result<Mascota>> revisarRachaDelDia() => obtenerMascota();
 
   @override
+  Future<Result<String>> mensajeMascota() async {
+    final r = await _api.get('/mascota/mensaje');
+    return r.como((d) => (d as Map<String, dynamic>)['mensaje'] as String);
+  }
+
+  @override
   Future<Result<Mascota>> acariciar() async => _mascota(await _api.post('/mascota/acariciar'));
 
   @override

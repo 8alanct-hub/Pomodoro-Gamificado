@@ -28,8 +28,12 @@ class MascotaViewModel extends ChangeNotifier {
 
   Mascota mascota = const Mascota();
 
+  /// `false` hasta recibir la mascota del servidor: mientras tanto la vista
+  /// muestra un indicador de carga en vez de un huevo vacío.
+  bool listo = false;
+
   /// Globo de texto sobre la mascota.
-  String mensaje = '¡Hola! Gracias por estudiar hoy.';
+  String mensaje = '¡Hola!';
 
   /// Aviso de los panes (se abre al tocar el chip).
   bool panesAbierto = false;
@@ -52,7 +56,26 @@ class MascotaViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Result<void>> _cargar() => _actualizar(_repo.obtenerMascota());
+  Future<Result<void>> _cargar() async {
+    final r = await _repo.obtenerMascota();
+    if (r is Error<Mascota>) {
+      notifyListeners();
+      return Result.error(r.error);
+    }
+    mascota = (r as Ok<Mascota>).value;
+    listo = true;
+    notifyListeners();
+    // El mensaje de la IA puede tardar unos segundos: llega después de la
+    // mascota y reemplaza el saludo inicial.
+    if (!mascota.esHuevo) {
+      final m = await _repo.mensajeMascota();
+      if (m is Ok<String>) {
+        mensaje = m.value;
+        notifyListeners();
+      }
+    }
+    return const Result.ok(null);
+  }
 
   Future<Result<void>> _guardarNombre(String nombre) async {
     final r = await _repo.ponerNombre(nombre);

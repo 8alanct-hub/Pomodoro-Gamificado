@@ -120,6 +120,12 @@ class ResultadoSesion(BaseModel):
     mascota: Mascota
 
 
+class MensajeMascota(BaseModel):
+    mensaje: str
+    # "ia" si lo generó Gemini; "respaldo" si es un mensaje fijo (sin clave o si la IA falló).
+    fuente: Literal["ia", "respaldo"]
+
+
 class NombreMascota(BaseModel):
     nombre: str = Field(min_length=1, max_length=20)
 

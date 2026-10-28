@@ -8,6 +8,7 @@ import '../ui/agregar_materia/widgets/agregar_materia_screen.dart';
 import '../ui/bienvenida/view_models/bienvenida_viewmodel.dart';
 import '../ui/bienvenida/widgets/bienvenida_screen.dart';
 import '../ui/core/ui/barra_navegacion.dart';
+import '../ui/core/ui/recargar_al_volver.dart';
 import '../ui/descanso/view_models/descanso_viewmodel.dart';
 import '../ui/descanso/widgets/descanso_screen.dart';
 import '../ui/inicio/view_models/inicio_viewmodel.dart';
@@ -63,13 +64,13 @@ GoRouter router(AuthRepository auth) => GoRouter(
     StatefulShellRoute.indexedStack(
       builder: (context, state, shell) => BarraNavegacion(navigationShell: shell),
       branches: [
-        _rama(Routes.mascota, (c) => MascotaScreen(
+        _rama(Routes.mascota, 0, (c) => MascotaScreen(
           viewModel: MascotaViewModel(gamificacionRepository: c.read()),
         )),
-        _rama(Routes.materias, (c) => MateriasScreen(
+        _rama(Routes.materias, 1, (c) => MateriasScreen(
           viewModel: MateriasViewModel(materiaRepository: c.read(), sesionRepository: c.read()),
         )),
-        _rama(Routes.inicio, (c) => InicioScreen(
+        _rama(Routes.inicio, 2, (c) => InicioScreen(
           viewModel: InicioViewModel(
             authRepository: c.read(),
             materiaRepository: c.read(),
@@ -78,10 +79,10 @@ GoRouter router(AuthRepository auth) => GoRouter(
             logroRepository: c.read(),
           ),
         )),
-        _rama(Routes.progreso, (c) => ProgresoScreen(
+        _rama(Routes.progreso, 3, (c) => ProgresoScreen(
           viewModel: ProgresoViewModel(sesionRepository: c.read(), materiaRepository: c.read()),
         )),
-        _rama(Routes.logros, (c) => LogrosScreen(
+        _rama(Routes.logros, 4, (c) => LogrosScreen(
           viewModel: LogrosViewModel(logroRepository: c.read()),
         )),
       ],
@@ -167,9 +168,15 @@ GoRouter router(AuthRepository auth) => GoRouter(
   ],
 );
 
-StatefulShellBranch _rama(String path, Widget Function(BuildContext) pantalla) =>
+/// Pestaña [indice] de la barra (en el mismo orden que la barra).
+StatefulShellBranch _rama(String path, int indice, Widget Function(BuildContext) pantalla) =>
     StatefulShellBranch(
-      routes: [GoRoute(path: path, builder: (context, state) => pantalla(context))],
+      routes: [
+        GoRoute(
+          path: path,
+          builder: (context, state) => RecargarAlVolver(indice: indice, pantalla: pantalla),
+        ),
+      ],
     );
 
 String? _redirect(AuthRepository auth, GoRouterState state) {

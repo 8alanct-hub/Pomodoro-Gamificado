@@ -11,6 +11,10 @@ abstract class GamificacionRepository {
 
   Future<Result<Mascota>> acariciar();
 
+  /// Lo que dice la mascota en su globo según la racha, la felicidad y lo
+  /// estudiado (en la versión remota lo genera la IA).
+  Future<Result<String>> mensajeMascota();
+
   /// Le pone nombre a la mascota (obligatorio al nacer): de 1 a 20 caracteres.
   Future<Result<Mascota>> ponerNombre(String nombre);
 

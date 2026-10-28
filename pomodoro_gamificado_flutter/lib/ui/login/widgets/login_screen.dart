@@ -132,7 +132,7 @@ class _Encabezado extends StatelessWidget {
           ),
           SizedBox(height: 16),
           Text(
-            'Pomodoro UTB',
+            'Pomodoro',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.w800,

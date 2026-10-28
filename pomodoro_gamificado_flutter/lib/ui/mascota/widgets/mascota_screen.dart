@@ -11,6 +11,7 @@ import '../../core/themes/colores.dart';
 import '../../core/ui/chip_contador.dart';
 import '../../core/ui/comunes.dart';
 import '../../core/ui/iconos_juego.dart';
+import '../../core/ui/mensajes.dart';
 import '../../core/ui/nombre_mascota.dart';
 import '../../core/ui/panes.dart';
 import '../view_models/mascota_viewmodel.dart';
@@ -26,12 +27,47 @@ class MascotaScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
-      builder: (context, _) => viewModel.mascota.esHuevo
+      listenable: Listenable.merge([viewModel, viewModel.cargar]),
+      builder: (context, _) => !viewModel.listo
+          ? _Cargando(viewModel: viewModel)
+          : viewModel.mascota.esHuevo
           ? _Huevo(viewModel: viewModel)
           : viewModel.faltaNombre
           ? _PonerNombre(viewModel: viewModel)
           : _MascotaVirtual(viewModel: viewModel),
+    );
+  }
+}
+
+/// Mientras llega la mascota del servidor, o si no se pudo cargar.
+class _Cargando extends StatelessWidget {
+  const _Cargando({required this.viewModel});
+
+  final MascotaViewModel viewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    final cargar = viewModel.cargar;
+    return Scaffold(
+      body: Center(
+        child: cargar.error
+            ? Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      mensajeDeError(cargar.result),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 15, color: Colores.textoSecundario),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(onPressed: cargar.execute, child: const Text('Reintentar')),
+                  ],
+                ),
+              )
+            : const CircularProgressIndicator(color: Colores.primario),
+      ),
     );
   }
 }
@@ -130,28 +166,6 @@ class _MascotaVirtualState extends State<_MascotaVirtual> with SingleTickerProvi
                   child: Stack(
                     children: [
                       const Positioned.fill(child: EscenaPlaya()),
-                      // Globo con el mensaje.
-                      Positioned(
-                        top: 16,
-                        left: 16,
-                        right: 16,
-                        child: Center(
-                          child: Container(
-                            constraints: const BoxConstraints(maxWidth: 280),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colores.blanco,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: const [BoxShadow(color: Color(0x1414173A), blurRadius: 8, offset: Offset(0, 2))],
-                            ),
-                            child: Text(
-                              vm.mensaje,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 14, height: 20 / 14, fontWeight: FontWeight.w700),
-                            ),
-                          ),
-                        ),
-                      ),
                       // Mascota (se menea al acariciarla).
                       Positioned(
                         left: 0,
@@ -165,7 +179,32 @@ class _MascotaVirtualState extends State<_MascotaVirtual> with SingleTickerProvi
                               final giro = t < .57 ? math.sin(t / .57 * math.pi * 3) * 0.12 * (1 - t / .57) : 0.0;
                               return Transform.rotate(angle: giro, alignment: Alignment.bottomCenter, child: child);
                             },
-                            child: Image.asset(Assets.mascota, height: 210, semanticLabel: 'Mascota Pomodoro 1'),
+                            child: Image.asset(Assets.mascota, height: 190, semanticLabel: 'Mascota Pomodoro 1'),
+                          ),
+                        ),
+                      ),
+                      // Globo con el mensaje (encima de la mascota).
+                      Positioned(
+                        top: 16,
+                        left: 16,
+                        right: 16,
+                        child: Center(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 300),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colores.blanco,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: const [BoxShadow(color: Color(0x1414173A), blurRadius: 8, offset: Offset(0, 2))],
+                            ),
+                            // Máximo 2 líneas para no tapar a la mascota.
+                            child: Text(
+                              vm.mensaje,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13, height: 18 / 13, fontWeight: FontWeight.w700),
+                            ),
                           ),
                         ),
                       ),

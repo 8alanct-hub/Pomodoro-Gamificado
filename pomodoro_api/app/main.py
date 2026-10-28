@@ -14,7 +14,7 @@ from .config import ajustes
 from .routers import auth, configuracion, logros, mascota, materias, perfil, pesca, sesiones
 
 app = FastAPI(
-    title="Pomodoro UTB API",
+    title="Pomodoro API",
     version="1.0.0",
     description="Backend del Pomodoro gamificado: sesiones, racha, mascota, conchas y logros.",
 )

@@ -25,6 +25,11 @@ class Ajustes(BaseSettings):
     # Orígenes permitidos para CORS (Flutter web en desarrollo).
     cors_origenes: list[str] = ["*"]
 
+    # IA de la mascota (Gemini). Sin clave, la mascota usa mensajes fijos.
+    # Clave en https://aistudio.google.com/apikey
+    gemini_api_key: str = ""
+    gemini_modelo: str = "gemini-3.5-flash-lite"
+
 
 @lru_cache
 def ajustes() -> Ajustes:

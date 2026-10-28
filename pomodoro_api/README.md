@@ -56,6 +56,7 @@ Todas menos `/auth/registro`, `/auth/login`, `/auth/refrescar` y `/salud` piden
 | POST | `/sesiones` | Empieza un pomodoro (el servidor anota la hora) | RF-005 |
 | POST | `/sesiones/{id}/finalizar` | Termina/salta: da conchas, suma racha, devuelve la mascota | RF-010, RF-016 |
 | GET | `/sesiones?desde=&hasta=` | Historial para Progreso | RF-011 |
+| GET | `/mascota/mensaje` | Lo que dice la mascota, generado con IA (Gemini) según tus datos | IA |
 | GET | `/mascota` | Estado; **revisa los días sin estudiar** (llamar al abrir la app) | RF-014, RF-015 |
 | POST | `/mascota/acariciar` | +5 de felicidad | |
 | PUT | `/mascota/nombre` | Ponerle o cambiarle el nombre (1–20 letras) | |
@@ -96,6 +97,21 @@ flutter run -t lib/main.dart --dart-define=VELOCIDAD=60
 - El servidor no acepta más segundos de los planeados ni de los que realmente
   pasaron. Con `MODO_DESARROLLO=true` se omite esto último, porque
   `main_development.dart` corre el reloj 60 veces más rápido.
+
+## 5. IA de la mascota (Gemini)
+
+`GET /mascota/mensaje` arma un resumen con los datos del estudiante (nombre de la
+mascota, racha, panes, felicidad, conchas, minutos de hoy, momento del día y las
+materias atrasadas en la semana) y le pide a Gemini una frase corta en la voz de la
+mascota. El código está en `app/ia.py`.
+
+- Clave gratis en <https://aistudio.google.com/apikey>; va en `.env` como
+  `GEMINI_API_KEY`. El modelo se cambia con `GEMINI_MODELO`.
+- Sin clave, o si Gemini falla o tarda más de 10 s, responde un mensaje fijo
+  (`"fuente": "respaldo"`), así la app nunca se queda sin texto.
+- El mensaje se guarda por estudiante mientras su situación no cambie (mismo día,
+  racha, felicidad, minutos…), para no gastar una llamada cada vez que abre la pantalla.
+- La IA solo recibe esos datos de estudio: nunca el correo ni la contraseña.
 
 ## Notas
 

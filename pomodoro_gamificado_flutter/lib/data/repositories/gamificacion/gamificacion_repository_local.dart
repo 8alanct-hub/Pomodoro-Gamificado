@@ -43,6 +43,17 @@ class GamificacionRepositoryLocal implements GamificacionRepository {
     return Result.ok(_data.mascota);
   }
 
+  /// Sin servidor no hay IA: mensajes fijos según la racha.
+  @override
+  Future<Result<String>> mensajeMascota() async {
+    final m = _data.mascota;
+    if (m.esHuevo) return const Result.ok('Completa un pomodoro de 25 min y naceré.');
+    if (_data.ultimoDiaConRacha == _soloFecha(DateTime.now())) {
+      return Result.ok('¡Gracias por estudiar hoy! Llevamos ${m.rachaDias} días de racha.');
+    }
+    return const Result.ok('¡Hola! Un pomodoro de 25 min y nuestra racha sigue creciendo.');
+  }
+
   @override
   Future<Result<Mascota>> acariciar() async {
     _data.mascota = _data.mascota.copyWith(

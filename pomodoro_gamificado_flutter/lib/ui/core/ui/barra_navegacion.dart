@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 
 import '../themes/colores.dart';
 import 'iconos_juego.dart';
+import 'recargar_al_volver.dart';
 
 /// Contenedor de las 5 pestañas: Mascota, Mis materias, Inicio, Progreso y
-/// Logros. Cada pestaña conserva su estado al cambiar entre ellas.
+/// Logros. Cada pestaña conserva su estado al cambiar entre ellas y recarga
+/// sus datos al volver a ella (ver `RecargarAlVolver`).
 class BarraNavegacion extends StatelessWidget {
   const BarraNavegacion({super.key, required this.navigationShell});
 
@@ -14,6 +16,8 @@ class BarraNavegacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actual = navigationShell.currentIndex;
+    // Avisa a las pestañas cuál se ve, para que recarguen al volver a ellas.
+    WidgetsBinding.instance.addPostFrameCallback((_) => pestanaActiva.value = actual);
     Widget item(int i, String etiqueta, Widget Function(Color) icono) {
       final activo = i == actual;
       final color = activo ? Colores.primario : Colores.textoSecundario;
